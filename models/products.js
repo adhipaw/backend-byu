@@ -10,7 +10,8 @@ export default class Product {
     image,
     brand,
     gender,
-    size
+    size,
+    quantity = false
   ) {
     this.id = id;
     this.name = name;
@@ -21,6 +22,18 @@ export default class Product {
     this.image = image;
     this.brand = brand;
     this.gender = gender;
+    if (quantity) this.quantity = quantity;
+  }
+
+  static getById(id) {
+    return new Promise((resolve, reject) => {
+      const sqlQuery = `SELECT * FROM products WHERE id = '${id}' LIMIT 1`;
+      connection.query(sqlQuery, (err, result) => {
+        if (err) return reject(err);
+        if (result.length === 0) return reject("Product not found");
+        return resolve(new Product(...Object.values(result[0])));
+      });
+    });
   }
 
   static getAll() {
@@ -28,7 +41,24 @@ export default class Product {
       const sqlQuery = `SELECT * FROM products`;
       connection.query(sqlQuery, (err, result) => {
         if (err) return reject(err);
-        return resolve(result);
+        const products = [];
+        result.forEach((product) => {
+          products.push(
+            new Product(
+              product.id,
+              product.name,
+              product.price,
+              product.description,
+              product.category,
+              product.image,
+              product.brand,
+              product.gender,
+              product.size,
+              product.quantity
+            )
+          );
+        });
+        return resolve(products);
       });
     });
   }
@@ -73,12 +103,29 @@ export default class Product {
     });
   }
 
-  static getAllBySerach(search) {
+  static getBySearch(search) {
     return new Promise((resolve, reject) => {
-      const sqlQuery = `SELECT * FROM products WHERE name LIKE '%${search}%'}`;
+      const sqlQuery = `SELECT * FROM products WHERE name LIKE '%${search}%'`;
       connection.query(sqlQuery, (err, result) => {
         if (err) return reject(err);
-        return resolve(result);
+        const products = [];
+        result.forEach((product) => {
+          products.push(
+            new Product(
+              product.id,
+              product.name,
+              product.price,
+              product.description,
+              product.category,
+              product.image,
+              product.brand,
+              product.gender,
+              product.size,
+              product.quantity
+            )
+          );
+        });
+        return resolve(products);
       });
     });
   }

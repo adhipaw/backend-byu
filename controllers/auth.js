@@ -35,9 +35,13 @@ export const login = async (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
 
       if (result) {
-        const token = jwt.sign({ user: user.user }, process.env.PRIVATE_KEY, {
-          expiresIn: 60 * 60,
-        });
+        const token = jwt.sign(
+          { user: { username: user.username, id: user.id } },
+          process.env.PRIVATE_KEY,
+          {
+            expiresIn: 60 * 60,
+          }
+        );
 
         return res.status(200).json({ token });
       }
