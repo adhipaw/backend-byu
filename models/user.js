@@ -2,16 +2,15 @@ import connection from "../db/connections.js";
 import crypto from "crypto";
 
 export default class User {
-  constructor(id = false, username, password, email, profilePic) {
+  constructor(id = false, username, password, email) {
     this.id = !id ? crypto.randomUUID() : id;
     this.username = username;
     this.password = password;
     this.email = email;
-    this.profilePic = profilePic;
   }
 
-  static UserFromDb(id, username, password, email, profilePic) {
-    return new User(id, username, password, email, profilePic);
+  static UserFromDb(id, username, password, email) {
+    return new User(id, username, password, email);
   }
 
   static findByUsername(username) {
@@ -47,10 +46,9 @@ export default class User {
     });
   }
 
-  update(username, password, email, profilePic) {
+  update(username, password, email) {
     this.username = username;
     this.password = password;
     this.email = email;
-    this.profilePic = profilePic;
   }
 }
