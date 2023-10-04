@@ -10,7 +10,8 @@ export default class Product {
     image,
     brand,
     gender,
-    size,
+    sizes,
+    size = false,
     quantity = false
   ) {
     this.id = id;
@@ -18,10 +19,11 @@ export default class Product {
     this.price = price;
     this.description = description;
     this.category = category;
-    this.size = size;
     this.image = image;
     this.brand = brand;
     this.gender = gender;
+    this.sizes = sizes;
+    if (size) this.size = size;
     if (quantity) this.quantity = quantity;
   }
 
@@ -31,7 +33,21 @@ export default class Product {
       connection.query(sqlQuery, (err, result) => {
         if (err) return reject(err);
         if (result.length === 0) return reject("Product not found");
-        return resolve(new Product(...Object.values(result[0])));
+        return resolve(
+          new Product(
+            result[0].id,
+            result[0].name,
+            result[0].price,
+            result[0].description,
+            result[0].category,
+            result[0].image,
+            result[0].brand,
+            result[0].gender,
+            result[0].sizes,
+            result[0].size,
+            result[0].quantity
+          )
+        );
       });
     });
   }
@@ -53,6 +69,7 @@ export default class Product {
               product.image,
               product.brand,
               product.gender,
+              product.sizes,
               product.size,
               product.quantity
             )
@@ -120,6 +137,7 @@ export default class Product {
               product.image,
               product.brand,
               product.gender,
+              product.sizes,
               product.size,
               product.quantity
             )

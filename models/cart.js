@@ -7,9 +7,9 @@ export default class Cart {
     this.products = products;
   }
 
-  static addToCart(user_id, product_id, quantity) {
+  static addToCart(user_id, product_id, quantity, size) {
     return new Promise((resolve, reject) => {
-      const sqlQuery = `INSERT INTO carts (user_id, product_id, quantity) VALUES ('${user_id}', '${product_id}', '${quantity}')`;
+      const sqlQuery = `INSERT INTO carts (user_id, product_id, quantity,size) VALUES ('${user_id}', '${product_id}', '${quantity}',${size})`;
       connection.query(sqlQuery, (err, result) => {
         if (err) return reject(err);
         return resolve(result);
@@ -37,6 +37,16 @@ export default class Cart {
     });
   }
 
+  static checkout(user_id) {
+    return new Promise((resolve, reject) => {
+      const sqlQuery = `DELETE FROM carts WHERE user_id = '${user_id}'`;
+      connection.query(sqlQuery, (err, result) => {
+        if (err) return reject(err);
+        return resolve(result);
+      });
+    });
+  }
+
   static getUserCart(user_id) {
     return new Promise((resolve, reject) => {
       const sqlQuery = `SELECT * FROM carts JOIN products ON products.id = carts.product_id WHERE user_id = '${user_id}'`;
@@ -55,6 +65,7 @@ export default class Cart {
               product.image,
               product.brand,
               product.gender,
+              product.sizes,
               product.size,
               product.quantity
             )

@@ -13,20 +13,37 @@ export default class User {
     return new User(id, username, password, email);
   }
 
-  static findByUsername(username) {
+  static findByID(id) {
     return new Promise((resolve, reject) => {
-      const sqlQuery = `SELECT * FROM users WHERE username = '${username}' LIMIT 1`;
+      const sqlQuery = `SELECT * FROM users WHERE id = '${id}' LIMIT 1`;
       connection.query(sqlQuery, (err, result) => {
         if (err) return reject(err);
-        if (result.length === 0) return reject("User not found");
+        if (result.length === 0) return resolve(null);
 
         return resolve(
           User.UserFromDb(
             result[0].id,
             result[0].username,
             result[0].password,
-            result[0].email,
-            result[0].profile_photo
+            result[0].email
+          )
+        );
+      });
+    });
+  }
+  static findByUsername(username) {
+    return new Promise((resolve, reject) => {
+      const sqlQuery = `SELECT * FROM users WHERE username = '${username}' LIMIT 1`;
+      connection.query(sqlQuery, (err, result) => {
+        if (err) return reject(err);
+        if (result.length === 0) return resolve(null);
+
+        return resolve(
+          User.UserFromDb(
+            result[0].id,
+            result[0].username,
+            result[0].password,
+            result[0].email
           )
         );
       });
@@ -36,7 +53,7 @@ export default class User {
   save() {
     return new Promise((resolve, reject) => {
       const sqlQuery = `INSERT INTO users (id, username, password, email) 
-    values ('${this.id}', '${this.username}', '${this.password}', '${this.email}','${this.profilePic}') 
+    values ('${this.id}', '${this.username}', '${this.password}', '${this.email}') 
     ON DUPLICATE KEY UPDATE id = '${this.id}', username = '${this.username}', password = '${this.password}', email = '${this.email}'`;
 
       connection.query(sqlQuery, (err, result) => {
