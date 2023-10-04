@@ -1,38 +1,43 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 export const getUser = async (req, res) => {
-  const { id: user_id } = req.user;
-  const user = await User.findByID(user_id).catch((err) =>
-    res.status(404).json({ message: err })
-  );
+  try {
+    const { id: user_id } = req.user;
+    const user = await User.findByID(user_id);
+    if (user === null)
+      return res.status(404).json({ message: "User not found" });
 
-  if (user === null) return res.status(404).json({ message: "User not found" });
-
-  delete user.password;
-  return res.status(200).json({ data: user });
+    delete user.password;
+    return res.status(200).json({ data: user });
+  } catch (err) {
+    return res.status(404).json({ message: err });
+  }
 };
 
 export const updateUser = async (req, res) => {
-  const { id: user_id } = req.user;
-  const { username, email } = req.body;
+  try {
+    const { id: user_id } = req.user;
+    const { username, email } = req.body;
 
-  const userExists = await User.findByUsername(username).catch((err) =>
-    res.status(500).json({ error: err.message })
-  );
+    const userExists = await User.findByUsername(username);
 
-  if (userExists) return res.status(409).json({ error: "User already exists" });
+    if (userExists)
+      return res.status(409).json({ error: "User already exists" });
 
-  const user = await User.findByID(user_id).catch((err) =>
-    res.status(404).json({ message: err })
-  );
+    const user = await User.findByID(user_id);
 
-  if (user === null) return res.status(404).json({ message: "User not found" });
+    if (user === null)
+      return res.status(404).json({ message: "User not found" });
 
-  user.username = username;
-  user.email = email;
+    user.username = username;
+    user.email = email;
 
-  await user.save().catch((err) => res.status(409).json({ message: err }));
-  return res.status(200).json({ message: "User updated" });
+    await user.save();
+
+    return res.status(200).json({ message: "User updated" });
+  } catch (err) {
+    return res.status(404).json({ message: err });
+  }
 };
 
 export const register = async (req, res) => {
